@@ -56,10 +56,19 @@ namespace VSFormsManager
                            { ShortcutKeys = Keys.Control | Keys.O };
             var miSaveAs = new ToolStripMenuItem("Save Form &As…", null, MiSaveAs_Click)
                            { ShortcutKeys = Keys.Control | Keys.S, Enabled = false };
-            var miExit   = new ToolStripMenuItem("E&xit", null, (_, _) => Close());
+            var miNewProject = new ToolStripMenuItem(
+                "&New Project from Library…", null, MiNewProject_Click)
+                { ShortcutKeys = Keys.Control | Keys.Shift | Keys.N };
+            var miExit = new ToolStripMenuItem("E&xit", null, (_, _) => Close());
 
             miFile.DropDownItems.AddRange(new ToolStripItem[]
-                { miBrowse, miSaveAs, new ToolStripSeparator(), miExit });
+            {
+                miBrowse, miSaveAs,
+                new ToolStripSeparator(),
+                miNewProject,
+                new ToolStripSeparator(),
+                miExit
+            });
 
             var miTools    = new ToolStripMenuItem("&Tools");
             var miAiConfig = new ToolStripMenuItem("&AI Provider Settings…",
@@ -106,7 +115,21 @@ namespace VSFormsManager
             btnSaveAs.FlatAppearance.BorderColor = Color.FromArgb(0, 80, 160);
             btnSaveAs.Click += MiSaveAs_Click;
 
-            pnlToolbar.Controls.AddRange(new Control[] { btnBrowse, btnSaveAs });
+            var btnNewProject = new Button
+            {
+                Text      = "🗂  New Project…",
+                Size      = new Size(148, 30),
+                Location  = new Point(362, 8),
+                Font      = new Font("Segoe UI", 9.5f),
+                BackColor = Color.FromArgb(60, 120, 60),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
+            };
+            btnNewProject.FlatAppearance.BorderColor = Color.FromArgb(40, 100, 40);
+            btnNewProject.Click += MiNewProject_Click;
+
+            pnlToolbar.Controls.AddRange(new Control[]
+                { btnBrowse, btnSaveAs, btnNewProject });
 
             var toolSep = new Panel
                 { Dock = DockStyle.Top, Height = 1, BackColor = SystemColors.ControlDark };
@@ -202,6 +225,12 @@ namespace VSFormsManager
             }
 
             using var dlg = new frmSaveAs(current, AppSession.Settings);
+            dlg.ShowDialog(this);
+        }
+
+        private void MiNewProject_Click(object? sender, EventArgs e)
+        {
+            using var dlg = new frmBatchProject(new Services.FormsRepository());
             dlg.ShowDialog(this);
         }
 
